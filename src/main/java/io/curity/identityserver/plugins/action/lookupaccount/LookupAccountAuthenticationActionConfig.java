@@ -28,8 +28,12 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
 {
     AccountManager getAccountManager();
 
-    @Description("When on authentication flow will be aborted if the user is not found")
+    @Description("When true authentication flow will be aborted if the user is not found")
     @DefaultBoolean(false) Boolean getAbortAuthenticationIfUserNotFound();
+
+    @Description("The attributes location")
+    @DefaultEnum("SUBJECT_ATTRIBUTES")
+    AttributeLocation getAttributeLocation();
 
     @Description("Select the method to lookup account attributes")
     @DefaultEnum("BY_USERNAME")
@@ -44,4 +48,12 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
     {
         BY_USERNAME, BY_EMAIL, BY_PHONE
     }
-}
+
+    enum AttributeLocation
+    {
+        SUBJECT_ATTRIBUTES,
+        CONTEXT_ATTRIBUTES,
+        ACTION_ATTRIBUTES
+    }
+    }
+
