@@ -28,6 +28,12 @@ public final class LookupAccountAuthenticationActionDescriptor implements Authen
     }
 
     @Override
+    public Class<? extends AuthenticationAction> getBackchannelAuthenticationAction()
+    {
+        return LookupAccountAuthenticationAction.class;
+    }
+
+    @Override
     public String getPluginImplementationType()
     {
         return "lookupaccount";
