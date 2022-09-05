@@ -36,7 +36,7 @@ public final class LookupAccountAuthenticationActionDescriptor implements Authen
     @Override
     public String getPluginImplementationType()
     {
-        return "lookupaccount";
+        return "lookup-account";
     }
 
     @Override

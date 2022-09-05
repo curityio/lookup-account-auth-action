@@ -41,12 +41,28 @@ You need to configure the following options for the plugin:
 .. image:: docs/authentication-action-config.png
   :alt: Configuration in the admin UI
 
-- Account Manager: You must provide an account manager which will be used to retrieve the user's account attributes from the datasource.
-- Abort Authentication If User Not Found: Action plugins aborts the authentication flow if the looked up user is not found in the underlying datasource.
-- Attribute Location: Specify the location where the lookup account attributes should be added. Default value is ``subject-attributes``. 
-- Custom Attribute Name Lookup: Specify the attribute to be used by the lookup method for searching the user.
-- Lookup Method: Select the method to be used for looking up the user. Supported methods are ``BY_USERNAME, BY_EMAIL, BY_PHONE``
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
 
+   * - Configuration
+     - Mandatory
+     - Description
+   * - Account Manager
+     - Yes
+     - The Account manager that will be used to retrieve the user's account attributes from the datasource
+   * - Abort Authentication If User Not Found
+     - No
+     - The Action plugin aborts the authentication flow if the looked up user is not found in the underlying datasource
+   * - Attribute Location
+     - Yes
+     - The location where the looked-up account attributes should be added
+   * - Source Attribute Name
+     - Yes
+     - The attribute to be used by the lookup method for searching the user
+   * - Lookup Method
+     - Yes
+     - The method to be used for looking up the user. Supported methods are ``BY_USERNAME, BY_EMAIL, BY_PHONE``
 
 More Information
 ~~~~~~~~~~~~~~~~

@@ -42,7 +42,7 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
     @Description("Specify the attribute to be used by the lookup method for searching the user")
     @DefaultString("subject")
     @Suggestions({"email"})
-    String getCustomAttributeNameLookup();
+    String getSourceAttributeName();
 
     enum LookupMethod
     {
@@ -55,5 +55,5 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
         CONTEXT_ATTRIBUTES,
         ACTION_ATTRIBUTES
     }
-    }
+}
 

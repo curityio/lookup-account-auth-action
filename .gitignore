@@ -13,5 +13,6 @@ buildNumber.properties
 
 ### IntelliJ ###
 .idea/
+.DS_Store
 *.iml
 .editorconfig

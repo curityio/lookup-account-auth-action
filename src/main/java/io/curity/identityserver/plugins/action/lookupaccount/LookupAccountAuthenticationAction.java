@@ -29,18 +29,18 @@ import se.curity.identityserver.sdk.service.AccountManager;
 public final class LookupAccountAuthenticationAction implements AuthenticationAction {
     private static final Logger _logger = LoggerFactory.getLogger(LookupAccountAuthenticationAction.class);
 
-    private static final String ATTRIBUTES_KEY = "account";  // Compliant
+    private static final String ATTRIBUTES_KEY = "account";
     private final AccountManager _accountManager;
     private final boolean _abortAuthenticationIfUserNotFound;
     private final LookupAccountAuthenticationActionConfig.LookupMethod _lookupMethod;
     private final LookupAccountAuthenticationActionConfig.AttributeLocation _attributeLocation;
-    private final String _customAttributeName;
+    private final String _sourceAttributeName;
 
     public LookupAccountAuthenticationAction(LookupAccountAuthenticationActionConfig configuration) {
         _accountManager = configuration.getAccountManager();
         _abortAuthenticationIfUserNotFound = configuration.getAbortAuthenticationIfUserNotFound();
         _lookupMethod = configuration.getLookupMethod();
-        _customAttributeName = configuration.getCustomAttributeNameLookup().trim();
+        _sourceAttributeName = configuration.getSourceAttributeName().trim();
         _attributeLocation = configuration.getAttributeLocation();
     }
 
@@ -49,10 +49,10 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
         AuthenticationAttributes authenticationAttributes = context.getAuthenticationAttributes();
         AuthenticationActionAttributes authenticationActionAttributes = context.getActionAttributes();
 
-        @Nullable String customAttributeValue = authenticationAttributes.getSubjectAttributes().get(_customAttributeName) == null ? null
-                : authenticationAttributes.getSubjectAttributes().get(_customAttributeName).getAttributeValue().getValue().toString().trim();
+        @Nullable String sourceAttributeValue = authenticationAttributes.getSubjectAttributes().get(_sourceAttributeName) == null ? null
+                : authenticationAttributes.getSubjectAttributes().get(_sourceAttributeName).getAttributeValue().getValue().toString().trim();
 
-        @Nullable AccountAttributes accountAttributes = customAttributeValue == null ? null : getAccountAttributes(customAttributeValue);
+        @Nullable AccountAttributes accountAttributes = sourceAttributeValue == null ? null : getAccountAttributes(sourceAttributeValue);
 
         if (accountAttributes == null && _abortAuthenticationIfUserNotFound) {
             _logger.debug("Account not found");
