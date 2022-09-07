@@ -18,7 +18,11 @@ package io.curity.identityserver.plugins.action.lookupaccount
 
 import io.curity.identityserver.plugins.action.lookupaccount.LookupAccountAuthenticationActionConfig.AttributeLocation
 import io.curity.identityserver.plugins.action.lookupaccount.LookupAccountAuthenticationActionConfig.LookupMethod
-import se.curity.identityserver.sdk.attribute.*
+import se.curity.identityserver.sdk.attribute.AccountAttributes
+import se.curity.identityserver.sdk.attribute.ContextAttributes
+import se.curity.identityserver.sdk.attribute.Attributes
+import se.curity.identityserver.sdk.attribute.AuthenticationActionAttributes
+import se.curity.identityserver.sdk.attribute.AuthenticationAttributes
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationActionContext
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationActionResult
 import se.curity.identityserver.sdk.service.AccountManager
@@ -112,6 +116,7 @@ class LookupAuthenticationActionTest extends Specification {
 
         then: 'the result is a successfull authentication action result'
         result instanceof AuthenticationActionResult.SuccessAuthenticationActionResult
+        result.getAuthenticationAttributes().account == null
 
     }
 
@@ -155,7 +160,7 @@ class LookupAuthenticationActionTest extends Specification {
     private void verifyResult(AttributeLocation attributeLocation, String userName, AuthenticationActionResult result) {
         switch (attributeLocation) {
             case AttributeLocation.SUBJECT_ATTRIBUTES:
-                result.getAuthenticationAttributes().subject == userName
+                result.getAuthenticationAttributes().getSubjectAttributes().account.getValue().get("userName") == userName
                 break
 
             case AttributeLocation.CONTEXT_ATTRIBUTES:
