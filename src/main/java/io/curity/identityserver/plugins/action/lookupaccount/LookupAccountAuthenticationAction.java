@@ -80,11 +80,11 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
 
     }
 
-    private AccountAttributes getAccountAttributes(String customAttributeValue) {
+    private AccountAttributes getAccountAttributes(String attributeValue) {
         return switch (_lookupMethod) {
-            case BY_USERNAME -> _accountManager.getByUserName(customAttributeValue);
-            case BY_EMAIL -> _accountManager.getByEmail(customAttributeValue);
-            case BY_PHONE -> _accountManager.getByPhone(customAttributeValue);
+            case BY_USERNAME -> _accountManager.getByUserName(attributeValue);
+            case BY_EMAIL -> _accountManager.getByEmail(attributeValue);
+            case BY_PHONE -> _accountManager.getByPhone(attributeValue);
         };
     }
 }
