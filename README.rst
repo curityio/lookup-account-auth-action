@@ -1,7 +1,7 @@
 Lookup Account Authentication Action Plugin
 =============================================
 
-.. image:: https://img.shields.io/badge/quality-demo-red
+.. image:: https://img.shields.io/badge/quality-production-green
    :target: https://curity.io/resources/code-examples/status/
    :alt: Quality
 
