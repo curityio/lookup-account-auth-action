@@ -55,13 +55,13 @@ You need to configure the following options for the plugin:
      - No
      - The Action plugin aborts the authentication flow if the looked up user is not found in the underlying datasource
    * - Attribute Location
-     - Yes
+     - No
      - The location where the looked-up account attributes should be added
    * - Source Attribute Name
-     - Yes
+     - No
      - The attribute to be used by the lookup method for searching the user
    * - Lookup Method
-     - Yes
+     - No
      - The method to be used for looking up the user. Supported methods are ``BY_USERNAME, BY_EMAIL, BY_PHONE``
 
 More Information
