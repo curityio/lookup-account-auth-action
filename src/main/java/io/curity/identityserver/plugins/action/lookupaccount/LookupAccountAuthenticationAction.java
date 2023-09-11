@@ -26,11 +26,14 @@ import se.curity.identityserver.sdk.attribute.Attributes;
 import se.curity.identityserver.sdk.attribute.AuthenticationActionAttributes;
 import se.curity.identityserver.sdk.attribute.AuthenticationAttributes;
 import se.curity.identityserver.sdk.attribute.MapAttributeValue;
+import se.curity.identityserver.sdk.attribute.scim.v2.extensions.Device;
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationAction;
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationActionContext;
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationActionResult;
 import se.curity.identityserver.sdk.errors.ErrorCode;
 import se.curity.identityserver.sdk.service.AccountManager;
+
+import java.util.Collection;
 
 public final class LookupAccountAuthenticationAction implements AuthenticationAction {
     private static final Logger _logger = LoggerFactory.getLogger(LookupAccountAuthenticationAction.class);
@@ -42,12 +45,15 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
     private final LookupAccountAuthenticationActionConfig.AttributeLocation _attributeLocation;
     private final String _sourceAttributeName;
 
+    private final boolean _includeDevices;
+
     public LookupAccountAuthenticationAction(LookupAccountAuthenticationActionConfig configuration) {
         _accountManager = configuration.getAccountManager();
         _abortAuthenticationIfUserNotFound = configuration.getAbortAuthenticationIfUserNotFound();
         _lookupMethod = configuration.getLookupMethod();
         _sourceAttributeName = configuration.getSourceAttributeName().trim();
         _attributeLocation = configuration.getAttributeLocation();
+        _includeDevices = configuration.getIncludeDevices() != null ? configuration.getIncludeDevices() : false;
     }
 
     @Override
@@ -67,6 +73,9 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
         } else if (accountAttributes == null) {
             // Continue with the authentication flow even if the account is not found.
             return AuthenticationActionResult.successfulResult(authenticationAttributes);
+        } else if (_includeDevices){
+            // Add devices
+            accountAttributes.withDevices(getDevices(accountAttributes.getUserName()).toArray(Device[]::new));
         }
 
         Attributes nonEmptyAttributes = accountAttributes.stream().filter(accountAttribute -> !accountAttribute.getAttributeValue().isEmpty()).collect(AttributeCollector.toAttributes());
@@ -92,5 +101,9 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
             case BY_EMAIL -> _accountManager.getByEmail(attributeValue);
             case BY_PHONE -> _accountManager.getByPhone(attributeValue);
         };
+    }
+
+    private Collection<Device> getDevices(String username) {
+        return _accountManager.getDevicesByUserName(username);
     }
 }
