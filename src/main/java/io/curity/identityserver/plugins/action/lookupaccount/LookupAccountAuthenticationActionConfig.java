@@ -44,6 +44,9 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
     @Suggestions({"email"})
     String getSourceAttributeName();
 
+    @Description("When true attributes will include linked devices")
+    @DefaultBoolean(false) Boolean getIncludeDevices();
+
     enum LookupMethod
     {
         BY_USERNAME, BY_EMAIL, BY_PHONE
