@@ -63,6 +63,10 @@ You need to configure the following options for the plugin:
    * - Lookup Method
      - No
      - The method to be used for looking up the user. Supported methods are ``BY_USERNAME, BY_EMAIL, BY_PHONE``
+   * - Include Devices
+     - No
+     - The account attributes will include devices
+
 
 More Information
 ~~~~~~~~~~~~~~~~
