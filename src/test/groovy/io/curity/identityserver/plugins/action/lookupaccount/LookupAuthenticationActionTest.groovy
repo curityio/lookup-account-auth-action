@@ -89,6 +89,21 @@ class LookupAuthenticationActionTest extends Specification {
         attributeLocation << [AttributeLocation.SUBJECT_ATTRIBUTES, AttributeLocation.CONTEXT_ATTRIBUTES, AttributeLocation.ACTION_ATTRIBUTES]
     }
 
+    def 'Can find the user when Looked up using ID as the attribute and account attributes are added to the #attributeLocation'(AttributeLocation attributeLocation) {
+        given: 'An Authentication action context and configuration'
+        def context = Mock(AuthenticationActionContext)
+        def action = prepareMockData(context, SOURCE_ATTRIBUTE_NAME, LookupMethod.BY_ID, attributeLocation, Boolean.FALSE)
+
+        when: 'running the action'
+        def result = action.apply(context)
+
+        then: 'the result is a successfull authentication action result'
+        result instanceof AuthenticationActionResult.SuccessAuthenticationActionResult
+        verifyResult(attributeLocation, USERNAME, result)
+
+        where:
+        attributeLocation << [AttributeLocation.SUBJECT_ATTRIBUTES, AttributeLocation.CONTEXT_ATTRIBUTES, AttributeLocation.ACTION_ATTRIBUTES]
+    }
 
     def 'Action fails if the source-attribute is not existing and abort-authentication-if-user-not-found is true '() {
         given: 'An Authentication action context and configuration'
@@ -151,6 +166,11 @@ class LookupAuthenticationActionTest extends Specification {
                 config.getLookupMethod() >> LookupMethod.BY_PHONE
                 accountManager.getByPhone(PHONE_AS_USERNAME) >> AccountAttributes.of(ID, PHONE_AS_USERNAME)
                 break
+            case LookupMethod.BY_ID:
+                context.getAuthenticationAttributes() >> AuthenticationAttributes.of(ID, ContextAttributes.empty())
+                context.getActionAttributes() >> AuthenticationActionAttributes.fromAttributes(Attributes.of("userName", USERNAME))
+                config.getLookupMethod() >> LookupMethod.BY_ID
+                accountManager.getById(ID) >> AccountAttributes.of(ID, USERNAME)
         }
 
         return new LookupAccountAuthenticationAction(config)

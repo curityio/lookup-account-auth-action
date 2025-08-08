@@ -49,7 +49,7 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
 
     enum LookupMethod
     {
-        BY_USERNAME, BY_EMAIL, BY_PHONE
+        BY_USERNAME, BY_EMAIL, BY_PHONE, BY_ID
     }
 
     enum AttributeLocation
