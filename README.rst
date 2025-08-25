@@ -27,7 +27,7 @@ on each node, including the admin node. For more information about installing pl
 Required Dependencies
 """""""""""""""""""""
 
-You need at least version 7.3.0 of the Curity Identity Server to use this plugin.
+You need at least version 9.2.0 of the Curity Identity Server to use this plugin.
 
 For a list of the dependencies and their versions, run ``mvn dependency:list``. Ensure that all of these are installed in
 the plugin group. Otherwise, they will not be accessible to this plug-in and run-time errors will result.
@@ -62,7 +62,7 @@ You need to configure the following options for the plugin:
      - The attribute to be used by the lookup method for searching the user
    * - Lookup Method
      - No
-     - The method to be used for looking up the user. Supported methods are ``BY_USERNAME, BY_EMAIL, BY_PHONE``
+     - The method to be used for looking up the user. Supported methods are ``BY_USERNAME, BY_EMAIL, BY_PHONE, BY_ID``
    * - Include Devices
      - No
      - The account attributes will include devices

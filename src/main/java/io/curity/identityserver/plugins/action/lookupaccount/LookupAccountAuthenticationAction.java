@@ -95,11 +95,13 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
 
     }
 
+    @Nullable
     private AccountAttributes getAccountAttributes(String attributeValue) {
         return switch (_lookupMethod) {
             case BY_USERNAME -> _accountManager.getByUserName(attributeValue);
             case BY_EMAIL -> _accountManager.getByEmail(attributeValue);
             case BY_PHONE -> _accountManager.getByPhone(attributeValue);
+            case BY_ID -> _accountManager.getById(attributeValue);
         };
     }
 
