@@ -5,7 +5,7 @@ Lookup Account Authentication Action Plugin
    :target: https://curity.io/resources/code-examples/status/
    :alt: Quality
 
-.. image:: https://img.shields.io/badge/availability-source-blue
+.. image:: https://img.shields.io/badge/availability-bundled-green
    :target: https://curity.io/resources/code-examples/status/
    :alt: Availability
 
