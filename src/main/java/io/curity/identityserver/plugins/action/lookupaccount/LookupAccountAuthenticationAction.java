@@ -41,6 +41,7 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
     private static final String ATTRIBUTES_KEY = "account";
     private final AccountManager _accountManager;
     private final boolean _abortAuthenticationIfUserNotFound;
+    private final boolean _abortAuthenticationIfUserInactive;
     private final LookupAccountAuthenticationActionConfig.LookupMethod _lookupMethod;
     private final LookupAccountAuthenticationActionConfig.AttributeLocation _attributeLocation;
     private final String _sourceAttributeName;
@@ -50,6 +51,7 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
     public LookupAccountAuthenticationAction(LookupAccountAuthenticationActionConfig configuration) {
         _accountManager = configuration.getAccountManager();
         _abortAuthenticationIfUserNotFound = configuration.getAbortAuthenticationIfUserNotFound();
+        _abortAuthenticationIfUserInactive = configuration.getAbortAuthenticationIfUserInactive() != null && configuration.getAbortAuthenticationIfUserInactive();
         _lookupMethod = configuration.getLookupMethod();
         _sourceAttributeName = configuration.getSourceAttributeName().trim();
         _attributeLocation = configuration.getAttributeLocation();
@@ -69,6 +71,10 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
         if (accountAttributes == null && _abortAuthenticationIfUserNotFound) {
             _logger.debug("Account not found");
             // Error message has been kept generic to prevent account enumeration.
+            return AuthenticationActionResult.failedResult("Provided credentials were invalid", ErrorCode.ACCESS_DENIED);
+        } else if (accountAttributes != null && _abortAuthenticationIfUserInactive && !accountAttributes.isActive()) {
+            _logger.debug("Account is inactive");
+            // Same response as for an unknown account, so that it does not reveal whether the account is inactive.
             return AuthenticationActionResult.failedResult("Provided credentials were invalid", ErrorCode.ACCESS_DENIED);
         } else if (accountAttributes == null) {
             // Continue with the authentication flow even if the account is not found.

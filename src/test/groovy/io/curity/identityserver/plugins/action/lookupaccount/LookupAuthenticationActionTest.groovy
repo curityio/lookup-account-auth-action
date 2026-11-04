@@ -25,6 +25,7 @@ import se.curity.identityserver.sdk.attribute.AuthenticationActionAttributes
 import se.curity.identityserver.sdk.attribute.AuthenticationAttributes
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationActionContext
 import se.curity.identityserver.sdk.authenticationaction.AuthenticationActionResult
+import se.curity.identityserver.sdk.errors.ErrorCode
 import se.curity.identityserver.sdk.service.AccountManager
 import spock.lang.Specification
 
@@ -135,6 +136,109 @@ class LookupAuthenticationActionTest extends Specification {
 
     }
 
+
+    def 'Inactive account with abort-authentication-if-user-inactive #abortIfInactive using #lookupMethod and #attributeLocation gives #expected'(
+            LookupMethod lookupMethod, AttributeLocation attributeLocation, Boolean abortIfInactive, boolean expectedFailure) {
+        given: 'An inactive account'
+        def context = Mock(AuthenticationActionContext)
+        def action = prepareInactiveMockData(context, lookupMethod, attributeLocation, abortIfInactive, Boolean.FALSE, AccountAttributes.of(ID, USERNAME).withActive(false))
+
+        when: 'running the action'
+        def result = action.apply(context)
+
+        then:
+        if (expectedFailure) {
+            assert result instanceof AuthenticationActionResult.FailedAuthenticationActionResult
+            assert result.errorCode == ErrorCode.ACCESS_DENIED
+            assert result.errorDescription == "Provided credentials were invalid"
+        } else {
+            assert result instanceof AuthenticationActionResult.SuccessAuthenticationActionResult
+            verifyResult(attributeLocation, USERNAME, result)
+        }
+
+        where:
+        [lookupMethod, attributeLocation, abortIfInactive] << [LookupMethod.values(), AttributeLocation.values(), [Boolean.TRUE, Boolean.FALSE, null]].combinations()
+        expectedFailure = abortIfInactive == Boolean.TRUE
+        expected = expectedFailure ? 'a failure' : 'a success'
+    }
+
+    def 'Account without the active attribute is treated as inactive when abort-authentication-if-user-inactive is true'() {
+        given: 'An account without the active attribute'
+        def context = Mock(AuthenticationActionContext)
+        def action = prepareInactiveMockData(context, LookupMethod.BY_USERNAME, AttributeLocation.SUBJECT_ATTRIBUTES, Boolean.TRUE, Boolean.FALSE, AccountAttributes.of(ID, USERNAME))
+
+        when: 'running the action'
+        def result = action.apply(context)
+
+        then: 'the result is a failed authentication action result'
+        result instanceof AuthenticationActionResult.FailedAuthenticationActionResult
+    }
+
+    def 'Active account is added when abort-authentication-if-user-inactive is true'(AttributeLocation attributeLocation) {
+        given: 'An active account'
+        def context = Mock(AuthenticationActionContext)
+        def action = prepareInactiveMockData(context, LookupMethod.BY_USERNAME, attributeLocation, Boolean.TRUE, Boolean.TRUE, AccountAttributes.of(ID, USERNAME).withActive(true))
+
+        when: 'running the action'
+        def result = action.apply(context)
+
+        then: 'the result is a successful authentication action result with the account'
+        result instanceof AuthenticationActionResult.SuccessAuthenticationActionResult
+        verifyResult(attributeLocation, USERNAME, result)
+
+        where:
+        attributeLocation << AttributeLocation.values()
+    }
+
+    def 'Unknown account with abort-authentication-if-user-inactive #abortIfInactive and abort-authentication-if-user-not-found #abortIfNotFound gives #expected'(
+            Boolean abortIfInactive, Boolean abortIfNotFound, boolean expectedFailure) {
+        given: 'An account that does not exist'
+        def context = Mock(AuthenticationActionContext)
+        def action = prepareInactiveMockData(context, LookupMethod.BY_USERNAME, AttributeLocation.SUBJECT_ATTRIBUTES, abortIfInactive, abortIfNotFound, null)
+
+        when: 'running the action'
+        def result = action.apply(context)
+
+        then:
+        if (expectedFailure) {
+            assert result instanceof AuthenticationActionResult.FailedAuthenticationActionResult
+        } else {
+            assert result instanceof AuthenticationActionResult.SuccessAuthenticationActionResult
+            assert result.getAuthenticationAttributes().account == null
+        }
+
+        where:
+        abortIfInactive | abortIfNotFound || expectedFailure
+        true            | false           || false
+        false           | false           || false
+        true            | true            || true
+        false           | true            || true
+        expected = expectedFailure ? 'a failure' : 'a success'
+    }
+
+    private LookupAccountAuthenticationAction prepareInactiveMockData(AuthenticationActionContext context, LookupMethod lookupMethod,
+                                                                      AttributeLocation attributeLocation, Boolean abortIfInactive,
+                                                                      Boolean abortIfNotFound, AccountAttributes account) {
+        def accountManager = Mock(AccountManager)
+        def config = Mock(LookupAccountAuthenticationActionConfig)
+
+        config.getAccountManager() >> accountManager
+        config.getAbortAuthenticationIfUserNotFound() >> abortIfNotFound
+        config.getAbortAuthenticationIfUserInactive() >> abortIfInactive
+        config.getSourceAttributeName() >> SOURCE_ATTRIBUTE_NAME
+        config.getAttributeLocation() >> attributeLocation
+        config.getLookupMethod() >> lookupMethod
+
+        context.getAuthenticationAttributes() >> AuthenticationAttributes.of(USERNAME, ContextAttributes.empty())
+        context.getActionAttributes() >> AuthenticationActionAttributes.fromAttributes(Attributes.of("userName", USERNAME))
+
+        accountManager.getByUserName(USERNAME) >> account
+        accountManager.getByEmail(USERNAME) >> account
+        accountManager.getByPhone(USERNAME) >> account
+        accountManager.getById(USERNAME) >> account
+
+        return new LookupAccountAuthenticationAction(config)
+    }
 
     private LookupAccountAuthenticationAction prepareMockData(AuthenticationActionContext context, String sourceAttributeName,
                                                               LookupMethod lookupMethod, AttributeLocation attributeLocation,
