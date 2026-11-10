@@ -68,18 +68,23 @@ public final class LookupAccountAuthenticationAction implements AuthenticationAc
 
         @Nullable AccountAttributes accountAttributes = sourceAttributeValue == null ? null : getAccountAttributes(sourceAttributeValue);
 
-        if (accountAttributes == null && _abortAuthenticationIfUserNotFound) {
-            _logger.debug("Account not found");
-            // Error message has been kept generic to prevent account enumeration.
-            return AuthenticationActionResult.failedResult("Provided credentials were invalid", ErrorCode.ACCESS_DENIED);
-        } else if (accountAttributes != null && _abortAuthenticationIfUserInactive && !accountAttributes.isActive()) {
+        if (accountAttributes == null) {
+            if (_abortAuthenticationIfUserNotFound) {
+                _logger.debug("Account not found");
+                // Error message has been kept generic to prevent account enumeration.
+                return AuthenticationActionResult.failedResult("Provided credentials were invalid", ErrorCode.ACCESS_DENIED);
+            }
+            // Continue with the authentication flow even if the account is not found.
+            return AuthenticationActionResult.successfulResult(authenticationAttributes);
+        }
+
+        if (_abortAuthenticationIfUserInactive && !accountAttributes.isActive()) {
             _logger.debug("Account is inactive");
             // Same response as for an unknown account, so that it does not reveal whether the account is inactive.
             return AuthenticationActionResult.failedResult("Provided credentials were invalid", ErrorCode.ACCESS_DENIED);
-        } else if (accountAttributes == null) {
-            // Continue with the authentication flow even if the account is not found.
-            return AuthenticationActionResult.successfulResult(authenticationAttributes);
-        } else if (_includeDevices){
+        }
+
+        if (_includeDevices) {
             // Add devices
             accountAttributes.withDevices(getDevices(accountAttributes.getUserName()).toArray(Device[]::new));
         }
