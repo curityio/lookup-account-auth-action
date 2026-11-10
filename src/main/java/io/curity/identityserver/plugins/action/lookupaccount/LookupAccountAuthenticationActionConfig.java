@@ -31,6 +31,9 @@ public interface LookupAccountAuthenticationActionConfig extends Configuration
     @Description("When true authentication flow will be aborted if the user is not found")
     @DefaultBoolean(false) Boolean getAbortAuthenticationIfUserNotFound();
 
+    @Description("When true authentication flow will be aborted if the user is found but is inactive")
+    @DefaultBoolean(false) Boolean getAbortAuthenticationIfUserInactive();
+
     @Description("The attributes location")
     @DefaultEnum("SUBJECT_ATTRIBUTES")
     AttributeLocation getAttributeLocation();

@@ -54,6 +54,9 @@ You need to configure the following options for the plugin:
    * - Abort Authentication If User Not Found
      - No
      - The Action plugin aborts the authentication flow if the looked up user is not found in the underlying datasource
+   * - Abort Authentication If User Inactive
+     - No
+     - The Action plugin aborts the authentication flow if the looked up user is found but is inactive. The failure is the same as for an unknown user. Defaults to ``false``
    * - Attribute Location
      - No
      - The location where the looked-up account attributes should be added
